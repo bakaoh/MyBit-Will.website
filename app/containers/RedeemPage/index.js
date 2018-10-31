@@ -12,7 +12,7 @@ import Pagination from 'antd/lib/pagination';
 import 'antd/lib/table/style/css';
 import 'antd/lib/pagination/style/css';
 import Constants from 'components/Constants';
-import QuestionMark from 'components/input/questionMark.svg';
+// import QuestionMark from 'components/input/questionMark.svg';
 import Img from 'components/Img';
 import Button from 'components/Button';
 import Tooltip from 'components/Tooltip';
@@ -172,12 +172,12 @@ export default class RedeemPage extends React.Component {
           arrowPointAtCenter={true}
           placement="topRight"
         >
-          <StyledQuestionMark>
+          {/* <StyledQuestionMark>
             <Img
               src={QuestionMark}
               alt="Hover for information"
             />
-          </StyledQuestionMark>
+          </StyledQuestionMark> */}
         </Tooltip>
 
       </div>

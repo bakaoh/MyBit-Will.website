@@ -10,13 +10,13 @@ const StyledLogo = styled(Link)`
   left: 21px;
 `
 
-const MyBitTrustLogo = (
+const MyBitWillLogo = (
     <StyledLogo to="/">
       <Img
         src={Logo}
-        alt="MyBit Trust Dapp"
+        alt="MyBit Will Dapp"
       />
     </StyledLogo>
 );
 
-export default MyBitTrustLogo;
+export default MyBitWillLogo;

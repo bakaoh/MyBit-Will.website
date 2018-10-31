@@ -70,17 +70,14 @@ export class HomePage extends React.PureComponent {
     return (
       <StyledPage>
         <Helmet>
-          <title>MyBit Trust</title>
+          <title>MyBit Will</title>
           <meta
-            name="MyBit Trust"
-            content="Create a transactions on the MyBit Trust dApp"
+            name="MyBit Will"
+            content="Create a transactions on the MyBit Will dApp"
           />
         </Helmet>
         <H1>
-          Trust Funds on the Blockchain.
-        </H1>
-        <H1>
-          Distribute crypto assets without a middleman.
+          Will on the Blockchain.
         </H1>
         <StyledParagraphGroupText>
           <P
@@ -91,7 +88,7 @@ export class HomePage extends React.PureComponent {
           <P
             fontSize={Constants.paragraphs.homePage.fontSize}
             textAlign={Constants.paragraphs.homePage.textAlign}
-            text="MyBit Trust works exactly like a regular trust, just without the time and expense of a lawyer or excessive third party fees. Each trust has a one-time setup fee of 250 MYB, which is burnt."
+            text="MyBit Will is a way to automate the distribution of crypto assets if something happens to the owner such as death."
           />
           <P
             fontSize={Constants.paragraphs.homePage.fontSize}
@@ -99,8 +96,8 @@ export class HomePage extends React.PureComponent {
           >
             <StyledHowTo>
               <span>1. Enable Metamask</span>
-              <span>2. Specify recipients ether address, amount, and when to distribute</span>
-              <span>3. You are all set! Once set up, your crypto assets are held in a trust secured by Blockchain</span>
+              <span>2. Specify recipients ether address, amount, and how often you must log in to prove existence</span>
+              <span>3. You are all set! Once set up, your crypto assets will be transferred to the recipient if something happens to you</span>
             </StyledHowTo>
           </P>
           <StyledNote>

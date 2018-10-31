@@ -119,21 +119,21 @@ class BlockchainInfo extends React.Component {
 
     try{
       response.forEach(transaction => {
-        if(transaction.returnValues._beneficiary === userAddress){
+        // if(transaction.returnValues._beneficiary === userAddress){
           receivedTransactionsTmp.push({
             contractAddress: transaction.returnValues._trustAddress,
             trustor: transaction.returnValues._trustor,
             amount: Web3.utils.fromWei(transaction.returnValues._amount.toString(), 'ether'),
             transactionHash: transaction.transactionHash,
           })
-        }
-        else if(transaction.returnValues._trustor === userAddress){
+        // }
+        // else if(transaction.returnValues._trustor === userAddress){
           sentTransactions.push({
             beneficiary: transaction.returnValues._beneficiary,
             amount: Web3.utils.fromWei(transaction.returnValues._amount.toString(), 'ether'),
             transactionHash: transaction.transactionHash
           })
-        }
+        // }
       })
      }catch(err){
       console.log(err)

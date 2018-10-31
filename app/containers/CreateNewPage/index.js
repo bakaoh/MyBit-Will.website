@@ -107,8 +107,8 @@ export default class CreateNewPage extends React.Component {
       title: 'Amount',
       content: [amountEth + " ETH"]
     }, {
-      title: 'Deliver on Block Number',
-      content: [blockNumber + currentBlock]
+      title: 'Verify Period',
+      content: [blockNumber]
     })
 
     this.setState({shouldConfirm: true})
@@ -125,7 +125,7 @@ export default class CreateNewPage extends React.Component {
       console.log(result)
 
       if(result){
-        result = await this.props.createTrust(
+        result = await this.props.createWill(
           recepient,
           amountEth,
           false,
@@ -187,14 +187,16 @@ export default class CreateNewPage extends React.Component {
           type="number"
           value={this.state.amountEth}
           onChange={(number) => this.handleInputChange(number, 'amountEth')}
+          tooltipTitle="How much ETH do you want to send on execution?"
+          hasTooltip
           min={0}
         />
         <Input
-          placeholder="Send payment in #blocks"
+          placeholder="Verify period"
           type="number"
           value={this.state.blockNumber}
           onChange={(number) => this.handleInputChange(number, 'blockNumber')}
-          tooltipTitle="How many blocks until payment is sent? 250 is roughly 1 hour."
+          tooltipTitle="How often do you want to check in and delay the transaction in blocks. Default is 1000 blocks."
           hasTooltip
           min={10}
         />
@@ -244,10 +246,10 @@ export default class CreateNewPage extends React.Component {
     return (
       <article>
         <Helmet>
-          <title>Create - MyBit Trust</title>
+          <title>Create - MyBit Will</title>
           <meta
             name="Create"
-            content="Create a transaction to take place on a given block on the MyBit Trust dApp"
+            content="Create a transaction to take place on a given block on the MyBit Will dApp"
           />
         </Helmet>
         {toRender}

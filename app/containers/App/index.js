@@ -19,7 +19,7 @@ import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import Header from 'components/Header';
 import Footer from 'components/Footer';
 import AppWrapper from 'components/AppWrapper';
-import MyBitTrustLogo from 'components/MyBitTrustLogo';
+import MyBitWillLogo from 'components/MyBitWillLogo';
 import PageWrapper from 'components/PageWrapper';
 import Button from 'components/Button';
 import Constants from 'components/Constants';
@@ -45,12 +45,12 @@ class App extends React.Component {
         mobileMenuOpen={mobileMenuOpen}
       >
         <Helmet
-          defaultTitle="MyBit Trust"
+          defaultTitle="MyBit Will"
         >
           <meta name="description" content="Schedule a transaction in the ethereum network" />
         </Helmet>
         <Header
-          logo={MyBitTrustLogo}
+          logo={MyBitWillLogo}
           links={Links}
           optionalButton
           mobileMenuOpen={mobileMenuOpen}
@@ -75,9 +75,9 @@ class App extends React.Component {
             />
             <Route path="/create-new" component={() =>
               <BlockchainInfoContext.Consumer>
-                {({ createTrust, currentBlock, getTransactions, userAllowed, requestApproval, checkAddressAllowed, user, loading, network }) =>  (
+                {({ createWill, currentBlock, getTransactions, userAllowed, requestApproval, checkAddressAllowed, user, loading, network }) =>  (
                     <CreateNewPage
-                      createTrust={createTrust}
+                      createWill={createWill}
                       currentBlock={currentBlock}
                       getTransactions={getTransactions}
                       userAllowed={userAllowed}

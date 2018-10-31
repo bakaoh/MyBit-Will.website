@@ -1,14 +1,21 @@
 import dayjs from 'dayjs';
 import getWeb3Async from './web3';
+
+import * as WillsRopsten from '../constants/contracts/ropsten/Wills';
 import * as TrustFactoryRopsten from '../constants/contracts/ropsten/TrustFactory';
 import * as TrustRopsten from '../constants/contracts/ropsten/Trust';
 import * as MyBitBurnerRopsten from '../constants/contracts/ropsten/MyBitBurner';
 import * as MyBitTokenRopsten from '../constants/contracts/ropsten/MyBitToken';
 
+import * as WillsMainnet from '../constants/contracts/mainnet/Wills';
 import * as TrustFactoryMainnet from '../constants/contracts/mainnet/TrustFactory';
 import * as TrustMainnet from '../constants/contracts/mainnet/Trust';
 import * as MyBitBurnerMainnet from '../constants/contracts/mainnet/MyBitBurner';
 import * as MyBitTokenMainnet from '../constants/contracts/mainnet/MyBitToken';
+
+import * as WillsPrivate from '../constants/contracts/private/Wills';
+import * as MyBitBurnerPrivate from '../constants/contracts/private/MyBitBurner';
+import * as MyBitTokenPrivate from '../constants/contracts/private/MyBitToken';
 
 import { ETHERSCAN_TX, ETHERSCAN_TX_FULL_PAGE } from '../constants';
 import axios from 'axios';
@@ -19,8 +26,24 @@ const burnValueWei = Web3.utils.toWei(burnValue, 'ether');
 
 const getContract = (name, network, address) => {
   let contract = undefined;
-  if(network === "ropsten"){
+  console.log("network",network)
+  if(network === "private"){
     switch (name) {
+      case 'Wills':
+        contract = WillsPrivate;
+        break;
+      case 'MyBitBurner':
+        contract = MyBitBurnerPrivate;
+        break;
+      case 'MyBitToken':
+        contract = MyBitTokenPrivate;
+        break;
+    }
+  } else if(network === "ropsten"){
+    switch (name) {
+      case 'Wills':
+        contract = WillsRopsten;
+        break;
       case 'Trust':
         contract = TrustRopsten;
         break;
@@ -34,9 +57,11 @@ const getContract = (name, network, address) => {
         contract = MyBitTokenRopsten;
         break;
     }
-  }
-  else {
+  } else {
     switch (name) {
+      case 'Wills':
+        contract = WillsMainnet;
+        break;
       case 'Trust':
         contract = TrustMainnet;
         break;
@@ -152,7 +177,7 @@ export const getTrustLog = async (network) =>
 
       const logTransactions = await trustContract.getPastEvents(
         'LogNewTrust',
-        { fromBlock: 0, toBlock: 'latest' },
+        { fromBlock: 6205610, toBlock: 'latest' },
       );
 
       resolve(logTransactions);
@@ -169,7 +194,7 @@ export const getWithdrawlsLog = async (contractAddress, network) =>
 
       const logWithdawls = await trustContract.getPastEvents(
         'LogWithdraw',
-        { fromBlock: 0, toBlock: 'latest' },
+        { fromBlock: 6205610, toBlock: 'latest' },
       );
 
       resolve(logWithdawls);

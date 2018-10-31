@@ -22,10 +22,10 @@ export const Links = [
     text: 'How it works',
     linkTo: '/',
   },{
-    text: 'Transaction History',
+    text: 'Claim',
     linkTo: '/transactions',
   },{
-    text: 'Redeem',
+    text: 'Verify',
     linkTo: '/redeem',
   }, {
     text: 'Create new',
