@@ -24,10 +24,20 @@ const Web3 = getWeb3Async();
 const burnValue = "250";
 const burnValueWei = Web3.utils.toWei(burnValue, 'ether');
 
+const getMyBitBurnerAddress = (network) => {
+  if (network === "private") {
+    return MyBitBurnerPrivate.ADDRESS;
+  } else if (network === "ropsten") {
+    return MyBitBurnerRopsten.ADDRESS;
+  } else {
+    return MyBitBurnerMainnet.ADDRESS;
+  }
+}
+
 const getContract = (name, network, address) => {
   let contract = undefined;
-  console.log("network",network)
-  if(network === "private"){
+  console.log("network", network)
+  if (network === "private") {
     switch (name) {
       case 'Wills':
         contract = WillsPrivate;
@@ -39,7 +49,7 @@ const getContract = (name, network, address) => {
         contract = MyBitTokenPrivate;
         break;
     }
-  } else if(network === "ropsten"){
+  } else if (network === "ropsten") {
     switch (name) {
       case 'Wills':
         contract = WillsRopsten;
@@ -96,7 +106,7 @@ export const loadMetamaskUserDetails = async (network) =>
         .balanceOf(accounts[0])
         .call();
 
-      if(myBitBalance > 0){
+      if (myBitBalance > 0) {
         myBitBalance = myBitBalance / Math.pow(10, 18);
       }
 
@@ -132,10 +142,10 @@ export const getApprovalLogs = async (network) =>
 export const requestApproval = async (address, network) =>
   new Promise(async (resolve, reject) => {
     try {
-      const burnerAddress = MyBitBurnerPrivate.ADDRESS;
+      const burnerAddress = getMyBitBurnerAddress(network);
       const mybitTokenContract = getContract("MyBitToken", network);
 
-      const estimatedGas = await mybitTokenContract.methods.approve(burnerAddress, burnValueWei).estimateGas({from: address});
+      const estimatedGas = await mybitTokenContract.methods.approve(burnerAddress, burnValueWei).estimateGas({ from: address });
       const gasPrice = await Web3.eth.getGasPrice();
 
       const approveResponse = await mybitTokenContract.methods
@@ -161,7 +171,7 @@ export const getAllowanceOfAddress = async (address, network) =>
 
       const mybitTokenContract = getContract("MyBitToken", network);
 
-      const allowance = await mybitTokenContract.methods.allowance(address, MyBitBurnerPrivate.ADDRESS).call();
+      const allowance = await mybitTokenContract.methods.allowance(address, getMyBitBurnerAddress(network)).call();
       resolve(allowance >= burnValueWei);
 
     } catch (error) {
@@ -203,22 +213,22 @@ export const getWithdrawlsLog = async (contractAddress, network) =>
     }
   });
 
-  export const getDepositsLog = async (contractAddress, network) =>
-    new Promise(async (resolve, reject) => {
-      try {
+export const getDepositsLog = async (contractAddress, network) =>
+  new Promise(async (resolve, reject) => {
+    try {
 
-        const trustContract = getContract("Trust", network, contractAddress);
+      const trustContract = getContract("Trust", network, contractAddress);
 
-        const logDeposits = await trustContract.getPastEvents(
-          'LogDeposit',
-          { fromBlock: 0, toBlock: 'latest' },
-        );
+      const logDeposits = await trustContract.getPastEvents(
+        'LogDeposit',
+        { fromBlock: 0, toBlock: 'latest' },
+      );
 
-        resolve(logDeposits);
-      } catch (error) {
-        reject(error);
-      }
-    });
+      resolve(logDeposits);
+    } catch (error) {
+      reject(error);
+    }
+  });
 
 export const getLogWillCreated = async (network) =>
 
@@ -261,9 +271,9 @@ export const createWill = async (from, to, amount, revokable, period, network) =
       const willsContract = getContract("Wills", network);
 
       const weiAmount = Web3.utils.toWei(amount.toString(), 'ether');
-      console.log("weiAmount",weiAmount,revokable,period,to)
+      console.log("weiAmount", weiAmount, revokable, period, to)
 
-      const estimatedGas = await willsContract.methods.createWill(to, period, revokable).estimateGas({from: from, value: weiAmount});
+      const estimatedGas = await willsContract.methods.createWill(to, period, revokable).estimateGas({ from: from, value: weiAmount });
       const gasPrice = await Web3.eth.getGasPrice();
 
       const willsResponse = await willsContract.methods
@@ -286,7 +296,7 @@ export const createWill = async (from, to, amount, revokable, period, network) =
     }
   });
 
-  export const verify = async (id, user, network) =>
+export const verify = async (id, user, network) =>
   new Promise(async (resolve, reject) => {
     try {
 
@@ -308,12 +318,36 @@ export const createWill = async (from, to, amount, revokable, period, network) =
 
       checkTransactionStatus(transactionHash, resolve, reject, network);
     } catch (error) {
-       console.log(error)
+      console.log(error)
       reject(error);
     }
   });
 
-  export const getWill = async (id, network) =>
+export const claim = async (id, user, network) =>
+  new Promise(async (resolve, reject) => {
+    try {
+
+      const willsContract = getContract("Wills", network);
+
+      // const estimatedGas = await willsContract.methods.claimWill(Web3.utils.fromAscii(id)).estimateGas({from: user});
+      // const gasPrice = await Web3.eth.getGasPrice();
+
+      const claimResponse = await willsContract.methods.claimWill(Web3.utils.fromAscii(id))
+        .send({
+          from: user,
+          // gas: estimatedGas,
+          // gasPrice: gasPrice
+        });
+
+      const { transactionHash } = claimResponse;
+
+      checkTransactionStatus(transactionHash, resolve, reject, network);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const getWill = async (id, network) =>
   new Promise(async (resolve, reject) => {
     try {
 
@@ -332,7 +366,7 @@ export const createTrust = async (from, to, amount, revokable, deadline, network
       const trustContract = getContract("TrustFactory", network);
 
       const weiAmount = Web3.utils.toWei(amount.toString(), 'ether');
-      const estimatedGas = await trustContract.methods.deployTrust(to, revokable, deadline).estimateGas({from: from, value: weiAmount});
+      const estimatedGas = await trustContract.methods.deployTrust(to, revokable, deadline).estimateGas({ from: from, value: weiAmount });
       const gasPrice = await Web3.eth.getGasPrice();
 
 
@@ -373,7 +407,7 @@ export const withdraw = async (contractAddress, user, network) =>
 
       const trustContract = getContract("Trust", network, contractAddress);
 
-      const estimatedGas = await trustContract.methods.withdraw().estimateGas({from: user});
+      const estimatedGas = await trustContract.methods.withdraw().estimateGas({ from: user });
       const gasPrice = await Web3.eth.getGasPrice();
 
       const withdrawResponse = await trustContract.methods.withdraw()
@@ -422,28 +456,28 @@ const checkTransactionConfirmation = async (
   resolve,
   reject,
   network,
-  ) => {
-  try{
+) => {
+  try {
     const url = ETHERSCAN_TX_FULL_PAGE(transactionHash, network);
     const response = await axios.get(url);
     var myRe = new RegExp('(<font color=\'green\'>Success</font>)', 'g');
     var r = myRe.exec(response.data);
-    if(r.length > 0){
+    if (r.length > 0) {
       resolve(true);
     }
 
     myRe = new RegExp('(<font color=\'red\'>Fail</font>)', 'g');
     r = myRe.exec(response.data);
-    if(r.length > 0){
+    if (r.length > 0) {
       resolve(false);
     }
-    else{
+    else {
       setTimeout(
         () => checkTransactionConfirmation(transactionHash, resolve, reject),
         1000,
       );
     }
-  }catch(err){
+  } catch (err) {
     setTimeout(
       () => checkTransactionConfirmation(transactionHash, resolve, reject),
       1000,

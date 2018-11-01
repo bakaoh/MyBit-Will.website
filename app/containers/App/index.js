@@ -13,7 +13,7 @@ import { Switch, Route } from 'react-router-dom';
 
 import HomePage from 'containers/HomePage/Loadable';
 import CreateNewPage from 'containers/CreateNewPage/Loadable';
-import RedeemPage from 'containers/RedeemPage/Loadable';
+import ClaimPage from 'containers/ClaimPage/Loadable';
 import VerifyPage from 'containers/VerifyPage/Loadable';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import Header from 'components/Header';
@@ -95,13 +95,13 @@ class App extends React.Component {
               </BlockchainInfoContext.Consumer>
             }
             />
-            <Route path="/redeem" component={() =>
+            <Route path="/claim" component={() =>
               <BlockchainInfoContext.Consumer>
-                {({ receivedTransactions, loading, withdraw, getTransactions, network }) =>  (
-                    <RedeemPage
+                {({ receivedTransactions, loading, claim, getTransactions, network }) =>  (
+                    <ClaimPage
                       receivedTransactions={receivedTransactions}
                       loading={loading.transactionHistory}
-                      withdraw={withdraw}
+                      claim={claim}
                       getTransactions={getTransactions}
                       network={network}
                       loadingNetwork={loading.network}

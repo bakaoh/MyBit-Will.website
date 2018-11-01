@@ -13,7 +13,7 @@ class BlockchainInfo extends React.Component {
     this.createWill = this.createWill.bind(this);
     this.getCurrentBlockNumber = this.getCurrentBlockNumber.bind(this);
     this.getTransactions = this.getTransactions.bind(this);
-    this.withdraw = this.withdraw.bind(this);
+    this.claim = this.claim.bind(this);
     this.verify = this.verify.bind(this);
     this.requestApproval = this.requestApproval.bind(this);
     this.checkAddressAllowed = this.checkAddressAllowed.bind(this);
@@ -37,7 +37,7 @@ class BlockchainInfo extends React.Component {
       createWill: this.createWill,
       currentBlock: 0,
       getTransactions: this.getTransactions,
-      withdraw: this.withdraw,
+      claim: this.claim,
       verify: this.verify,
       requestApproval: this.requestApproval,
       checkAddressAllowed: this.checkAddressAllowed,
@@ -115,8 +115,8 @@ class BlockchainInfo extends React.Component {
     return Core.createWill(this.state.user.userName, to, amount, revokable, period, this.state.network);
   }
 
-  withdraw(contractAddress) {
-    return Core.withdraw(contractAddress, this.state.user.userName, this.state.network);
+  claim(id) {
+    return Core.claim(id, this.state.user.userName, this.state.network);
   }
 
   verify(id) {
@@ -127,26 +127,25 @@ class BlockchainInfo extends React.Component {
     await Core.getLogWillCreated(this.state.network)
       .then( async (response) => {
         const userAddress = this.state.user.userName;
-        const receivedTransactionsTmp = [];
+        const receivedTransactionsRaw = [];
         const createTransactionsRaw = [];
 
     try{
       response.forEach(transaction => {
         console.log(transaction)
-        if(transaction.returnValues._beneficiary === userAddress){
-          receivedTransactionsTmp.push({
-            contractAddress: transaction.returnValues._trustAddress,
-            trustor: transaction.returnValues._trustor,
+        if(transaction.returnValues._recipient === userAddress){
+          receivedTransactionsRaw.push({
+            id: Web3.utils.toAscii(transaction.returnValues._id),
+            creator: transaction.returnValues._creator,
             amount: Web3.utils.fromWei(transaction.returnValues._amount.toString(), 'ether'),
-            transactionHash: transaction.transactionHash,
+            transactionHash: transaction.transactionHash
           })
         } else if(transaction.returnValues._creator === userAddress){
           createTransactionsRaw.push({
             id: Web3.utils.toAscii(transaction.returnValues._id),
             recipient: transaction.returnValues._recipient,
             amount: Web3.utils.fromWei(transaction.returnValues._amount.toString(), 'ether'),
-            transactionHash: transaction.transactionHash,
-            block: "123"
+            transactionHash: transaction.transactionHash
           })
         }
       })
@@ -169,25 +168,14 @@ class BlockchainInfo extends React.Component {
     }
 
       let receivedTransactions = [];
-      if(receivedTransactionsTmp.length !== 0){
-        const withdrawableByTime =  await Promise.all(receivedTransactionsTmp.map(async transaction =>
-        Core.isWithdrawable(transaction.contractAddress, this.state.network)));
+      if(receivedTransactionsRaw.length !== 0){
+        const wills =  await Promise.all(receivedTransactionsRaw.map(async transaction =>
+        Core.getWill(transaction.id, this.state.network)));
 
-        receivedTransactions = await Promise.all(receivedTransactionsTmp.map( async (transaction, index) => {
-            const withdrawals = await Core.getWithdrawlsLog(transaction.contractAddress, this.state.network);
-            const deposits = await Core.getDepositsLog(transaction.contractAddress, this.state.network);
-            let canWithdraw = true;
-
-            //block number of last withdrawal event is higher than block number of last deposit event
-            //means there is nothing to withdraw
-           if(withdrawals.length > 0 && withdrawals[withdrawals.length-1].blockNumber > deposits[deposits.length - 1].blockNumber){
-              canWithdraw = false;
-            }
-
+        receivedTransactions = await Promise.all(receivedTransactionsRaw.map( async (transaction, index) => {
             return{
               ...transaction,
-              withdrawable: canWithdraw,
-              pastDate: withdrawableByTime[index],
+              withdrawable:  parseInt(wills[index][4]) < this.state.currentBlock,
             }
           }))
       }
