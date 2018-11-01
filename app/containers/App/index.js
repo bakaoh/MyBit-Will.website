@@ -14,7 +14,7 @@ import { Switch, Route } from 'react-router-dom';
 import HomePage from 'containers/HomePage/Loadable';
 import CreateNewPage from 'containers/CreateNewPage/Loadable';
 import RedeemPage from 'containers/RedeemPage/Loadable';
-import TransactionsPage from 'containers/TransactionsPage/Loadable';
+import VerifyPage from 'containers/VerifyPage/Loadable';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import Header from 'components/Header';
 import Footer from 'components/Footer';
@@ -59,12 +59,14 @@ class App extends React.Component {
         <PageWrapper>
           <Switch>
             <Route exact path="/" component={HomePage} />
-            <Route path="/transactions" component={() =>
+            <Route path="/verify" component={() =>
               <BlockchainInfoContext.Consumer>
-                {({ sentTransactions, loading, network }) =>  (
-                    <TransactionsPage
-                      sentTransactions={sentTransactions}
+                {({ createTransactions, loading, verify, getTransactions, network }) =>  (
+                    <VerifyPage
+                      createTransactions={createTransactions}
                       loading={loading.transactionHistory}
+                      verify={verify}
+                      getTransactions={getTransactions}
                       network={network}
                       loadingNetwork={loading.network}
                     />

@@ -23,10 +23,10 @@ export const Links = [
     linkTo: '/',
   },{
     text: 'Claim',
-    linkTo: '/transactions',
+    linkTo: '/claim',
   },{
     text: 'Verify',
-    linkTo: '/redeem',
+    linkTo: '/verify',
   }, {
     text: 'Create new',
     linkTo: '/create-new',

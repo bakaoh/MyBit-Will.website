@@ -286,6 +286,46 @@ export const createWill = async (from, to, amount, revokable, period, network) =
     }
   });
 
+  export const verify = async (id, user, network) =>
+  new Promise(async (resolve, reject) => {
+    try {
+
+      console.log("id", Web3.utils.fromAscii(id))
+
+      const willsContract = getContract("Wills", network);
+
+      // const estimatedGas = await willsContract.methods.proveExistence(Web3.utils.fromAscii(id)).estimateGas({from: user});
+      // const gasPrice = await Web3.eth.getGasPrice();
+
+      const verifyResponse = await willsContract.methods.proveExistence(Web3.utils.fromAscii(id))
+        .send({
+          from: user,
+          // gas: estimatedGas,
+          // gasPrice: gasPrice
+        });
+
+      const { transactionHash } = verifyResponse;
+
+      checkTransactionStatus(transactionHash, resolve, reject, network);
+    } catch (error) {
+       console.log(error)
+      reject(error);
+    }
+  });
+
+  export const getWill = async (id, network) =>
+  new Promise(async (resolve, reject) => {
+    try {
+
+      const willsContract = getContract("Wills", network);
+
+      const will = await willsContract.methods.getWill(Web3.utils.fromAscii(id)).call();
+      resolve(will);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
 export const createTrust = async (from, to, amount, revokable, deadline, network) =>
   new Promise(async (resolve, reject) => {
     try {

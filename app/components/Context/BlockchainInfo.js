@@ -14,6 +14,7 @@ class BlockchainInfo extends React.Component {
     this.getCurrentBlockNumber = this.getCurrentBlockNumber.bind(this);
     this.getTransactions = this.getTransactions.bind(this);
     this.withdraw = this.withdraw.bind(this);
+    this.verify = this.verify.bind(this);
     this.requestApproval = this.requestApproval.bind(this);
     this.checkAddressAllowed = this.checkAddressAllowed.bind(this);
     this.getNetwork = this.getNetwork.bind(this);
@@ -26,6 +27,7 @@ class BlockchainInfo extends React.Component {
       },
       sentTransactions: [],
       receivedTransactions: [],
+      createTransactions: [],
       user: {
         myBitBalance: 0,
         etherBalance: 0,
@@ -36,6 +38,7 @@ class BlockchainInfo extends React.Component {
       currentBlock: 0,
       getTransactions: this.getTransactions,
       withdraw: this.withdraw,
+      verify: this.verify,
       requestApproval: this.requestApproval,
       checkAddressAllowed: this.checkAddressAllowed,
       //can be ropsten or main - else unknown
@@ -116,15 +119,20 @@ class BlockchainInfo extends React.Component {
     return Core.withdraw(contractAddress, this.state.user.userName, this.state.network);
   }
 
+  verify(id) {
+    return Core.verify(id, this.state.user.userName, this.state.network);
+  }
+
   async getTransactions(){
     await Core.getLogWillCreated(this.state.network)
       .then( async (response) => {
         const userAddress = this.state.user.userName;
         const receivedTransactionsTmp = [];
-        const sentTransactions = [];
+        const createTransactionsRaw = [];
 
     try{
       response.forEach(transaction => {
+        console.log(transaction)
         if(transaction.returnValues._beneficiary === userAddress){
           receivedTransactionsTmp.push({
             contractAddress: transaction.returnValues._trustAddress,
@@ -133,16 +141,32 @@ class BlockchainInfo extends React.Component {
             transactionHash: transaction.transactionHash,
           })
         } else if(transaction.returnValues._creator === userAddress){
-          sentTransactions.push({
-            beneficiary: transaction.returnValues._creator,
+          createTransactionsRaw.push({
+            id: Web3.utils.toAscii(transaction.returnValues._id),
+            recipient: transaction.returnValues._recipient,
             amount: Web3.utils.fromWei(transaction.returnValues._amount.toString(), 'ether'),
-            transactionHash: transaction.transactionHash
+            transactionHash: transaction.transactionHash,
+            block: "123"
           })
         }
       })
      }catch(err){
       console.log(err)
      }
+
+     var createTransactions = [];
+     if(createTransactionsRaw.length !== 0){
+      const wills =  await Promise.all(createTransactionsRaw.map(async transaction =>
+      Core.getWill(transaction.id, this.state.network)));
+
+      createTransactions = await Promise.all(createTransactionsRaw.map( async (transaction, index) => {
+
+          return{
+            ...transaction,
+            block: wills[index][4],
+          }
+        }))
+    }
 
       let receivedTransactions = [];
       if(receivedTransactionsTmp.length !== 0){
@@ -169,8 +193,8 @@ class BlockchainInfo extends React.Component {
       }
 
       this.setState({
-        sentTransactions,
         receivedTransactions,
+        createTransactions,
         loading: {
           ...this.state.loading,
           transactionHistory: false,
