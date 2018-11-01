@@ -10,6 +10,7 @@ class BlockchainInfo extends React.Component {
 
     this.loadMetamaskUserDetails = this.loadMetamaskUserDetails.bind(this);
     this.createTrust = this.createTrust.bind(this);
+    this.createWill = this.createWill.bind(this);
     this.getCurrentBlockNumber = this.getCurrentBlockNumber.bind(this);
     this.getTransactions = this.getTransactions.bind(this);
     this.withdraw = this.withdraw.bind(this);
@@ -31,6 +32,7 @@ class BlockchainInfo extends React.Component {
         userName: ""
       },
       createTrust: this.createTrust,
+      createWill: this.createWill,
       currentBlock: 0,
       getTransactions: this.getTransactions,
       withdraw: this.withdraw,
@@ -106,12 +108,16 @@ class BlockchainInfo extends React.Component {
     return Core.createTrust(this.state.user.userName, to, amount, revokable, deadline, this.state.network);
   }
 
+  createWill(to, amount, revokable, period) {
+    return Core.createWill(this.state.user.userName, to, amount, revokable, period, this.state.network);
+  }
+
   withdraw(contractAddress) {
     return Core.withdraw(contractAddress, this.state.user.userName, this.state.network);
   }
 
   async getTransactions(){
-    await Core.getTrustLog(this.state.network)
+    await Core.getLogWillCreated(this.state.network)
       .then( async (response) => {
         const userAddress = this.state.user.userName;
         const receivedTransactionsTmp = [];
@@ -119,21 +125,20 @@ class BlockchainInfo extends React.Component {
 
     try{
       response.forEach(transaction => {
-        // if(transaction.returnValues._beneficiary === userAddress){
+        if(transaction.returnValues._beneficiary === userAddress){
           receivedTransactionsTmp.push({
             contractAddress: transaction.returnValues._trustAddress,
             trustor: transaction.returnValues._trustor,
             amount: Web3.utils.fromWei(transaction.returnValues._amount.toString(), 'ether'),
             transactionHash: transaction.transactionHash,
           })
-        // }
-        // else if(transaction.returnValues._trustor === userAddress){
+        } else if(transaction.returnValues._creator === userAddress){
           sentTransactions.push({
-            beneficiary: transaction.returnValues._beneficiary,
+            beneficiary: transaction.returnValues._creator,
             amount: Web3.utils.fromWei(transaction.returnValues._amount.toString(), 'ether'),
             transactionHash: transaction.transactionHash
           })
-        // }
+        }
       })
      }catch(err){
       console.log(err)

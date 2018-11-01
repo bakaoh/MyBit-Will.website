@@ -132,7 +132,7 @@ export const getApprovalLogs = async (network) =>
 export const requestApproval = async (address, network) =>
   new Promise(async (resolve, reject) => {
     try {
-      const burnerAddress = network === "ropsten" ? MyBitBurnerRopsten.ADDRESS : MyBitBurnerMainnet.ADDRESS;
+      const burnerAddress = MyBitBurnerPrivate.ADDRESS;
       const mybitTokenContract = getContract("MyBitToken", network);
 
       const estimatedGas = await mybitTokenContract.methods.approve(burnerAddress, burnValueWei).estimateGas({from: address});
@@ -161,7 +161,7 @@ export const getAllowanceOfAddress = async (address, network) =>
 
       const mybitTokenContract = getContract("MyBitToken", network);
 
-      const allowance = await mybitTokenContract.methods.allowance(address, network === "ropsten" ? MyBitBurnerRopsten.ADDRESS : MyBitBurnerMainnet.ADDRESS ).call();
+      const allowance = await mybitTokenContract.methods.allowance(address, MyBitBurnerPrivate.ADDRESS).call();
       resolve(allowance >= burnValueWei);
 
     } catch (error) {
@@ -219,6 +219,72 @@ export const getWithdrawlsLog = async (contractAddress, network) =>
         reject(error);
       }
     });
+
+export const getLogWillCreated = async (network) =>
+
+  new Promise(async (resolve, reject) => {
+    try {
+      const willsContract = getContract("Wills", network);
+
+      const logTransactions = await willsContract.getPastEvents(
+        'LogWillCreated',
+        { fromBlock: 0, toBlock: 'latest' },
+      );
+
+      resolve(logTransactions);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const getLogWillClaimed = async (network) =>
+
+  new Promise(async (resolve, reject) => {
+    try {
+      const willsContract = getContract("Wills", network);
+
+      const logTransactions = await willsContract.getPastEvents(
+        'LogWillClaimed',
+        { fromBlock: 0, toBlock: 'latest' },
+      );
+
+      resolve(logTransactions);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const createWill = async (from, to, amount, revokable, period, network) =>
+  new Promise(async (resolve, reject) => {
+    console.log("createWill")
+    try {
+      const willsContract = getContract("Wills", network);
+
+      const weiAmount = Web3.utils.toWei(amount.toString(), 'ether');
+      console.log("weiAmount",weiAmount,revokable,period,to)
+
+      const estimatedGas = await willsContract.methods.createWill(to, period, revokable).estimateGas({from: from, value: weiAmount});
+      const gasPrice = await Web3.eth.getGasPrice();
+
+      const willsResponse = await willsContract.methods
+        .createWill(to, period, revokable)
+        .send({
+          value: weiAmount,
+          from: from,
+          gas: estimatedGas,
+          gasPrice: gasPrice
+        });
+
+      const { transactionHash } = willsResponse;
+      console.log("willsResponse", willsResponse)
+
+      checkTransactionStatus(transactionHash, resolve, reject, network);
+    } catch (error) {
+      console.log("error", error)
+
+      reject(error);
+    }
+  });
 
 export const createTrust = async (from, to, amount, revokable, deadline, network) =>
   new Promise(async (resolve, reject) => {
