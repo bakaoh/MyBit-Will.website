@@ -36,7 +36,6 @@ const getMyBitBurnerAddress = (network) => {
 
 const getContract = (name, network, address) => {
   let contract = undefined;
-  console.log("network", network)
   if (network === "private") {
     switch (name) {
       case 'Wills':
@@ -110,6 +109,7 @@ export const loadMetamaskUserDetails = async (network) =>
         myBitBalance = myBitBalance / Math.pow(10, 18);
       }
 
+      myBitBalance = parseInt(myBitBalance);
       const details = {
         userName: accounts[0],
         ethBalance: Web3.utils.fromWei(balance, 'ether'),

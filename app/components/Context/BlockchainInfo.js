@@ -132,7 +132,6 @@ class BlockchainInfo extends React.Component {
 
     try{
       response.forEach(transaction => {
-        console.log(transaction)
         if(transaction.returnValues._recipient === userAddress){
           receivedTransactionsRaw.push({
             id: Web3.utils.toAscii(transaction.returnValues._id),
