@@ -205,11 +205,12 @@ export default class VerifyPage extends React.Component {
     let endIndex = (currentPage + 1) * this.itemsPerPage;
     const rows = createTransactions.reverse().slice(startIndex, endIndex).map(transaction => {
 
-      let status = "Received";
-        if(this.state.transactionsProcessing.includes(transaction.id)){
+      let status = "";
+        if (transaction.block <= 0) {
+          status = "Expired"
+        } else if(this.state.transactionsProcessing.includes(transaction.id)){
          status = "Confirming..."
-        }
-        else {
+        } else {
           status = (
             <StyledButton>
               <Button
@@ -246,7 +247,7 @@ export default class VerifyPage extends React.Component {
           </span>,
         block:
           <span>
-            {transaction.block}
+            {transaction.block > 0 ? transaction.block : 0}
           </span>,
         status: status
         }

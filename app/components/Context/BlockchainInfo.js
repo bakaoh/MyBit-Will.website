@@ -159,12 +159,11 @@ class BlockchainInfo extends React.Component {
         if (createTransactionsRaw.length !== 0) {
           const wills = await Promise.all(createTransactionsRaw.map(async transaction =>
             Core.getWill(transaction.id, this.state.network)));
-
           createTransactions = await Promise.all(createTransactionsRaw.map(async (transaction, index) => {
 
             return {
               ...transaction,
-              block: wills[index][4],
+              block: parseInt(wills[index][4]) - this.state.currentBlock,
             }
           }))
         }

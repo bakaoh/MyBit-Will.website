@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Button from '../Button';
 import Constants from '../Constants';
-// import SidebarMobile from './SidebarMobile';
+ import SidebarMobile from './sidebarMobile';
 import HamburgerButton from './menu-icon.svg'
 import Img from '../Img';
 
@@ -127,11 +127,11 @@ const NavigationBar = (props) => {
           />
         </a>
       </div>
-      {/* <SidebarMobile
+      <SidebarMobile
         open={mobileMenuOpen}
         closePopup={handleClickMobileMenu}
         links={props.links}
-      /> */}
+      />
       <div className="NavigationBar--is-desktop">
         {toRender}
         {contributeButton}
