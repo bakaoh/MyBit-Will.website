@@ -1,7 +1,7 @@
 /*
- * Create New Trust Page
+ * Create New Will Page
  *
- * Page to create trust contracts
+ * Page to create will contracts
  */
 
 import React from 'react';

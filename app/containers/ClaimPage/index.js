@@ -1,5 +1,5 @@
 /*
- * TransactionsPage
+ * ClaimPage
  *
  * List all the features
  */

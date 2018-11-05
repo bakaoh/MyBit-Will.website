@@ -2,14 +2,10 @@ import dayjs from 'dayjs';
 import getWeb3Async from './web3';
 
 import * as WillsRopsten from '../constants/contracts/ropsten/Wills';
-import * as TrustFactoryRopsten from '../constants/contracts/ropsten/TrustFactory';
-import * as TrustRopsten from '../constants/contracts/ropsten/Trust';
 import * as MyBitBurnerRopsten from '../constants/contracts/ropsten/MyBitBurner';
 import * as MyBitTokenRopsten from '../constants/contracts/ropsten/MyBitToken';
 
 import * as WillsMainnet from '../constants/contracts/mainnet/Wills';
-import * as TrustFactoryMainnet from '../constants/contracts/mainnet/TrustFactory';
-import * as TrustMainnet from '../constants/contracts/mainnet/Trust';
 import * as MyBitBurnerMainnet from '../constants/contracts/mainnet/MyBitBurner';
 import * as MyBitTokenMainnet from '../constants/contracts/mainnet/MyBitToken';
 
@@ -53,12 +49,6 @@ const getContract = (name, network, address) => {
       case 'Wills':
         contract = WillsRopsten;
         break;
-      case 'Trust':
-        contract = TrustRopsten;
-        break;
-      case 'TrustFactory':
-        contract = TrustFactoryRopsten;
-        break;
       case 'MyBitBurner':
         contract = MyBitBurnerRopsten;
         break;
@@ -70,12 +60,6 @@ const getContract = (name, network, address) => {
     switch (name) {
       case 'Wills':
         contract = WillsMainnet;
-        break;
-      case 'Trust':
-        contract = TrustMainnet;
-        break;
-      case 'TrustFactory':
-        contract = TrustFactoryMainnet;
         break;
       case 'MyBitBurner':
         contract = MyBitBurnerMainnet;
@@ -174,57 +158,6 @@ export const getAllowanceOfAddress = async (address, network) =>
       const allowance = await mybitTokenContract.methods.allowance(address, getMyBitBurnerAddress(network)).call();
       resolve(allowance >= burnValueWei);
 
-    } catch (error) {
-      reject(error);
-    }
-  });
-
-export const getTrustLog = async (network) =>
-
-  new Promise(async (resolve, reject) => {
-    try {
-      const trustContract = getContract("TrustFactory", network);
-
-      const logTransactions = await trustContract.getPastEvents(
-        'LogNewTrust',
-        { fromBlock: 6205610, toBlock: 'latest' },
-      );
-
-      resolve(logTransactions);
-    } catch (error) {
-      reject(error);
-    }
-  });
-
-export const getWithdrawlsLog = async (contractAddress, network) =>
-  new Promise(async (resolve, reject) => {
-    try {
-
-      const trustContract = getContract("Trust", network, contractAddress);
-
-      const logWithdawls = await trustContract.getPastEvents(
-        'LogWithdraw',
-        { fromBlock: 6205610, toBlock: 'latest' },
-      );
-
-      resolve(logWithdawls);
-    } catch (error) {
-      reject(error);
-    }
-  });
-
-export const getDepositsLog = async (contractAddress, network) =>
-  new Promise(async (resolve, reject) => {
-    try {
-
-      const trustContract = getContract("Trust", network, contractAddress);
-
-      const logDeposits = await trustContract.getPastEvents(
-        'LogDeposit',
-        { fromBlock: 0, toBlock: 'latest' },
-      );
-
-      resolve(logDeposits);
     } catch (error) {
       reject(error);
     }
@@ -355,71 +288,6 @@ export const getWill = async (id, network) =>
 
       const will = await willsContract.methods.getWill(Web3.utils.fromAscii(id)).call();
       resolve(will);
-    } catch (error) {
-      reject(error);
-    }
-  });
-
-export const createTrust = async (from, to, amount, revokable, deadline, network) =>
-  new Promise(async (resolve, reject) => {
-    try {
-      const trustContract = getContract("TrustFactory", network);
-
-      const weiAmount = Web3.utils.toWei(amount.toString(), 'ether');
-      const estimatedGas = await trustContract.methods.deployTrust(to, revokable, deadline).estimateGas({ from: from, value: weiAmount });
-      const gasPrice = await Web3.eth.getGasPrice();
-
-
-      const trustResponse = await trustContract.methods
-        .deployTrust(to, revokable, deadline)
-        .send({
-          value: weiAmount,
-          from: from,
-          gas: estimatedGas,
-          gasPrice: gasPrice
-        });
-
-      const { transactionHash } = trustResponse;
-
-      checkTransactionStatus(transactionHash, resolve, reject, network);
-    } catch (error) {
-      reject(error);
-    }
-  });
-
-
-export const isWithdrawable = async (contractAddress, network) =>
-  new Promise(async (resolve, reject) => {
-    try {
-
-      const trustContract = getContract("Trust", network, contractAddress);
-
-      const secondsUntilDeadline = await trustContract.methods.blocksUntilExpiration().call();
-      resolve(secondsUntilDeadline === '0');
-    } catch (error) {
-      reject(error);
-    }
-  });
-
-export const withdraw = async (contractAddress, user, network) =>
-  new Promise(async (resolve, reject) => {
-    try {
-
-      const trustContract = getContract("Trust", network, contractAddress);
-
-      const estimatedGas = await trustContract.methods.withdraw().estimateGas({ from: user });
-      const gasPrice = await Web3.eth.getGasPrice();
-
-      const withdrawResponse = await trustContract.methods.withdraw()
-        .send({
-          from: user,
-          gas: estimatedGas,
-          gasPrice: gasPrice
-        });
-
-      const { transactionHash } = withdrawResponse;
-
-      checkTransactionStatus(transactionHash, resolve, reject, network);
     } catch (error) {
       reject(error);
     }

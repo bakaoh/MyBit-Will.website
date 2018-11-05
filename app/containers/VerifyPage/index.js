@@ -1,5 +1,5 @@
 /*
- * TransactionsPage
+ * VerifyPage
  *
  * List all the features
  */

@@ -9,7 +9,6 @@ class BlockchainInfo extends React.Component {
     super(props);
 
     this.loadMetamaskUserDetails = this.loadMetamaskUserDetails.bind(this);
-    this.createTrust = this.createTrust.bind(this);
     this.createWill = this.createWill.bind(this);
     this.getCurrentBlockNumber = this.getCurrentBlockNumber.bind(this);
     this.getTransactions = this.getTransactions.bind(this);
@@ -25,7 +24,6 @@ class BlockchainInfo extends React.Component {
         transactionHistory: true,
         network: true,
       },
-      sentTransactions: [],
       receivedTransactions: [],
       createTransactions: [],
       user: {
@@ -33,7 +31,6 @@ class BlockchainInfo extends React.Component {
         etherBalance: 0,
         userName: ""
       },
-      createTrust: this.createTrust,
       createWill: this.createWill,
       currentBlock: 0,
       getTransactions: this.getTransactions,
@@ -107,10 +104,6 @@ class BlockchainInfo extends React.Component {
     } catch (err) {
       setTimeout(this.getCurrentBlockNumber, 1000);
     }
-  }
-
-  createTrust(to, amount, revokable, deadline) {
-    return Core.createTrust(this.state.user.userName, to, amount, revokable, deadline, this.state.network);
   }
 
   createWill(to, amount, revokable, period) {
