@@ -170,6 +170,7 @@ class BlockchainInfo extends React.Component {
             return {
               ...transaction,
               withdrawable: parseInt(wills[index][4]) < this.state.currentBlock,
+              claimed: wills[index][0] != transaction.creator,
             }
           }))
         }

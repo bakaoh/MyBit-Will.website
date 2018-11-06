@@ -187,7 +187,7 @@ export default class VerifyPage extends React.Component {
       key: 'amount',
       align: 'center',
     }, {
-      title: 'Block#:',
+      title: 'Blocks until expiration:',
       dataIndex: 'block',
       key: 'block',
       align: 'center',

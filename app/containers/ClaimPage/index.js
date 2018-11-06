@@ -202,9 +202,10 @@ export default class ClaimPage extends React.Component {
 
       let status = "Pending";
         if(this.state.transactionsProcessing.includes(transaction.id)){
-         status = "Confirming..."
-        }
-        else if (transaction.withdrawable) {
+          status = "Confirming...";
+        } else if (transaction.claimed) {
+          status = "Claimed";
+        } else if (transaction.withdrawable) {
           status = (
             <StyledButton>
               <Button
@@ -299,6 +300,7 @@ ClaimPage.propTypes = {
      id: PropTypes.string.isRequired,
      amount: PropTypes.string.isRequired,
      withdrawable: PropTypes.bool.isRequired,
+     claimed: PropTypes.bool.isRequired,
    })).isRequired,
   loading: PropTypes.bool.isRequired,
   network: PropTypes.string.isRequired,
